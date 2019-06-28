@@ -1,0 +1,370 @@
+create user dailychan identified by a123
+default tablespace users
+temporary tablespace temp;
+
+grant connect, resource, alter session to dailychan;
+
+create table join
+(join_id varchar2(20),
+join_password varchar2(20),
+join_name varchar2(20),
+join_phone varchar2(20),
+join_email varchar2(50),
+join_recommender varchar2(20),
+join_snsAgree varchar2(5),
+join_emailAgree varchar2(5),
+join_point number,
+join_addrNum varchar2(10),
+join_addr1 varchar2(100),
+join_addr2 varchar2(100),
+join_created date,
+constraint join_id_pk primary key (join_id)
+);
+
+create table product
+(product_id number,
+product_subject varchar2(100),
+product_price number,
+product_resultPrice number,
+product_discount number,
+product_stock number,
+product_keep varchar2(10),
+product_delivery1 varchar2(20),
+product_delivery2 varchar2(20),
+product_delivery3 varchar2(20),
+product_buypoint varchar2(100),
+product_mainSaveFileName varchar2(50),
+product_contentSaveFileName varchar2(50),
+product_firstSelect varchar2(50),
+product_secondSelect varchar2(50),
+product_lastSelect varchar2(50),
+product_saleCount number,
+product_saleLimit number,
+product_like varchar2(10),
+product_recommand number,
+constraint product_id_pk primary key (product_id)
+);
+
+create table productTag
+(productTag_firstSelect varchar2(50),
+productTag_secondSelect varchar2(50),
+productTag_lastSelect varchar2(50)
+);
+
+create table productDetail
+(product_id number,
+productDetail_name varchar2(100),
+productDetail_volume varchar2(100),
+productDetail_made varchar2(100),
+productDetail_origin varchar2(100),
+productDetail_created varchar2(100),
+productDetail_counseling varchar2(20),
+productDetail_configuration varchar2(200),
+constraint productDetail_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table productRecommand
+(productRecommand_id number,
+join_id varchar2(20),
+product_id number,
+product_subject varchar2(100),
+productRecommand_reason varchar2(3000),
+productRecommand_point number,
+productRecommand_look varchar2(10),
+constraint productRecommand_id_pk primary key (productRecommand_id),
+constraint productRecommand_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint productRecommand_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table coupon
+(coupon_id number,
+join_id varchar2(20),
+coupon_price number,
+coupon_startDate date,
+coupon_endDate date,
+coupon_use number,
+constraint coupon_id_pk primary key (coupon_id),
+constraint coupon_joinId_fk foreign key (join_id) references join (join_id) on delete cascade
+);
+
+create table point
+(point_id number,
+join_id varchar2(20),
+orderList_id number,
+point_score number,
+point_created date,
+point_content varchar2(100),
+point_use number,
+constraint point_id_pk primary key (point_id),
+constraint point_joinId_fk foreign key (join_id) references join (join_id) on delete cascade
+);
+
+create table cart
+(cart_id number,
+join_id varchar2(20),
+product_id number,
+product_subject varchar2(100),
+product_mainSaveFileName varchar2(50),
+product_price number,
+product_discount number,
+product_resultPrice number,
+product_saleLimit number,
+cart_quantity number,
+constraint cart_id_pk primary key (cart_id),
+constraint cart_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint cart_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table productOrder
+(productOrder_id number,
+orderList_id number,
+join_id varchar2(20),
+product_id number,
+product_subject varchar2(100),
+product_resultPrice number,
+product_mainSaveFileName varchar2(50),
+cart_quantity number,
+constraint productOrder_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint productOrder_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table orderList
+(orderList_id number,
+join_id varchar2(20),
+coupon_id number,
+point_id number,
+orderList_created date,
+orderList_naturePackage varchar2(20),
+orderList_recyclePackage varchar2(20),
+orderList_step number,
+orderList_productCount number,
+orderList_resultPrice number,
+orderList_message varchar2(100),
+orderList_reciveName varchar2(20),
+orderList_recivePhone varchar2(20),
+orderList_reciveAddrNum varchar2(10),
+orderList_reciveAddr1 varchar2(100),
+orderList_reciveAddr2 varchar2(100),
+orderList_retrieve varchar2(10),
+orderList_sendName varchar2(20),
+orderList_sendPhone varchar2(20),
+orderList_store varchar2(50),
+orderList_payment varchar2(20),
+orderList_delivery varchar2(20),
+constraint orderList_id_pk primary key (orderList_id),
+constraint orderList_joinId_fk foreign key (join_id) references join (join_id) on delete cascade
+);
+
+create table reviewCheck 
+(reviewCheck_id number,
+join_id varchar2(20),
+orderList_id number,
+productOrder_id number,
+reviewCheck_check number,
+constraint reviewCheck_id_pk primary key (reviewCheck_id),
+constraint reviewCheck_joinId_fk foreign key (join_id) references join (join_id) on delete cascade
+);
+
+create table review
+(review_id number,
+join_id varchar2(20),
+product_id number,
+reviewCheck_id number,
+review_subject varchar2(100),
+review_content varchar2(2000),
+review_created date,
+review_grade number,
+review_saveFileName varchar2(50),
+point_score number,
+constraint review_id_pk primary key (review_id),
+constraint review_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint review_productId_fk foreign key (product_id) references product (product_id),
+constraint review_reviewCheckId_fk foreign key (reviewCheck_id) references reviewCheck (reviewCheck_id)
+);
+
+create table bestReview
+(bestReview_id number,
+join_id varchar2(20),
+product_id number,
+bestReview_subject varchar2(100),
+bestReview_content varchar2(2000),
+bestReview_created date,
+bestReview_grade number,
+bestReview_saveFileName varchar2(50),
+constraint bestReview_id_pk primary key (bestReview_id),
+constraint bestReview_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint bestReview_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table refund
+(orderList_id number,
+join_id varchar2(20),
+orderList_resultPrice number,
+refund_subject varchar2(100),
+refund_state number,
+refund_reason varchar2(2000),
+refund_saveFileName varchar2(50),
+refund_created date,
+constraint refund_orderListId_fk foreign key (orderList_id) references orderList (orderList_id),
+constraint refund_joinId_fk foreign key (join_id) references join (join_id) on delete cascade
+);
+
+create table zzimList
+(zzimList_id number,
+join_id varchar2(20),
+product_id number,
+product_subject varchar2(100),
+product_mainSaveFileName varchar2(50),
+product_price number,
+product_discount number,
+product_resultPrice number,
+constraint zzimList_id_pk primary key (zzimList_id),
+constraint zzimList_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint zzimList_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table faq
+(faq_id number,
+faq_subject varchar2(100),
+faq_content varchar2(2000),
+faq_division varchar2(50),
+constraint faq_id_fk primary key (faq_id)
+);
+
+create table notice
+(notice_id number,
+notice_subject varchar2(100),
+notice_content varchar2(2000),
+notice_saveFileName varchar2(50),
+notice_created date,
+constraint notice_id_pk primary key (notice_id)
+);
+
+create table recipe
+(recipe_id number,
+recipe_subject varchar2(100),
+recipe_select varchar2(50),
+recipe_mainSaveFileName varchar2(50),
+recipe_contentSaveFileName varchar2(50),
+constraint recipe_id_pk primary key (recipe_id)
+);
+
+create table myRecipe
+(join_id varchar2(20),
+recipe_id number,
+recipe_select varchar2(50) not null,
+constraint myRecipe_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint myRecipe_recipeId_fk foreign key (recipe_id) references recipe (recipe_id)
+);
+
+create table qna
+(qna_id number,
+join_id varchar2(20),
+qna_select varchar2(50),
+qna_type varchar2(100),
+qna_state varchar2(50),
+qna_subject varchar2(100),
+qna_created date,
+qna_content varchar2(2000),
+qna_saveFileName varchar2(50),
+qna_store varchar2(50),
+qna_reply varchar2(2000),
+constraint qna_id_pk primary key (qna_id),
+constraint qna_joinId_fk foreign key (join_id) references join (join_id) on delete cascade
+);
+
+create table productQuestion
+(productQuestion_id number,
+join_id varchar2(20),
+product_id number,
+product_subject varchar2(100),
+productQuestion_type varchar2(50),
+productQuestion_state varchar2(10),
+productQuestion_content varchar2(3000),
+productQuestion_created date,
+productQuestion_secret number,
+constraint productQuestion_id_pk primary key (productQuestion_id),
+constraint productQuestion_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint productQuestion_productId_fk foreign key (product_id) references product (product_id)
+);
+
+create table productAnswer
+(productAnswer_id number,
+join_id varchar2(20),
+product_id number,
+productQuestion_id number,
+productAnswer_created date,
+productAnswer_content varchar2(2000),
+constraint productAnswer_id_pk primary key (productAnswer_id),
+constraint productAnswer_joinId_fk foreign key (join_id) references join (join_id) on delete cascade,
+constraint productAnswer_productId_fk foreign key (product_id) references product (product_id),
+constraint productAnswer_productQId_fk foreign key (productQuestion_id) references productQuestion (productQuestion_id)
+);
+
+create table checkjuso (
+addr1 varchar2(20),
+addr2 varchar2(20));
+
+===============================================
+
+drop table product CASCADE constraints;
+drop table join CASCADE constraints;
+drop table productDetail CASCADE constraints;
+drop table review CASCADE constraints;
+drop table bestReview CASCADE constraints;
+drop table cart CASCADE constraints;
+drop table zzimList CASCADE constraints;
+drop table faq CASCADE constraints;
+drop table notice CASCADE constraints;
+drop table coupon CASCADE constraints;
+drop table buy CASCADE constraints;
+drop table point CASCADE constraints;
+drop table recipe CASCADE constraints;
+drop table tag CASCADE constraints;
+drop table recipeTag CASCADE constraints;
+drop table refund CASCADE constraints;
+drop table consulting CASCADE constraints;
+drop table myRecipe CASCADE constraints;
+
+=================================================
+2차 수정 삭제
+
+drop table product CASCADE constraints;
+drop table join CASCADE constraints;
+drop table productDetail CASCADE constraints;
+drop table review CASCADE constraints;
+drop table bestReview CASCADE constraints;
+drop table cart CASCADE constraints;
+drop table zzimList CASCADE constraints;
+drop table faq CASCADE constraints;
+drop table notice CASCADE constraints;
+drop table coupon CASCADE constraints;
+drop table productRecommand CASCADE constraints;
+drop table point CASCADE constraints;
+drop table recipe CASCADE constraints;
+drop table productTag CASCADE constraints;
+drop table checkJuso CASCADE constraints;
+drop table recipeTag CASCADE constraints;
+drop table refund CASCADE constraints;
+drop table qna CASCADE constraints;
+drop table myRecipe CASCADE constraints;
+drop table PRODUCTANSWER CASCADE constraints;
+drop table productQuestion CASCADE constraints;
+drop table productOrder CASCADE constraints;
+drop table reviewCheck CASCADE constraints;
+drop table orderList CASCADE constraints;
+
+==================================================
+//관리자 insert문
+
+insert into join 
+(join_id,join_password,join_name,join_phone,join_created)
+values ('admin','admin11!!','관리자','1577-0098',sysdate);
+
+==================================================
+
+select * from tab;
+
+purge RECYCLEBIN;
+
+ALTER TABLE product ADD(product_cost number);
